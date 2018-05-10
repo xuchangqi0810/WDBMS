@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.ILogDAO">
+    <!--添加日志信息-->
+    <insert id="adduserLog">
+        INSERT INTO sys_log(usercode,username,operateinfo,operatedatetime)VALUES(#{usercode},#{username},#{operateinfo},#{operatedatetime})
+    </insert>
+
+    <!--查询所有日志+分页-->
+    <select id="getAllLog" resultType="cn.xcq.entity.Log">
+        SELECT * FROM sys_log
+        <where>
+            <if test="username!=null">
+                AND username LIKE '%' #{username} '%'
+            </if>
+            <if test="opentime!=null">
+                AND operatedatetime&gt;=#{opentime}
+            </if>
+            <if test="lasttime!=null">
+                AND operatedatetime&lt;=#{lasttime}
+            </if>
+    </where>
+        limit #{pageIndex},#{pageSize}
+    </select>
+
+    <!--所有记录数-->
+    <select id="getCount" resultType="int">
+        SELECT count(1) FROM sys_log
+        <where>
+            <if test="username!=null">
+                AND username LIKE '%' #{username} '%'
+            </if>
+            <if test="opentime!=null">
+                AND operatedatetime&gt;=#{opentime}
+            </if>
+            <if test="lasttime!=null">
+                AND operatedatetime&lt;=#{lasttime}
+            </if>
+        </where>
+    </select>
+</mapper>

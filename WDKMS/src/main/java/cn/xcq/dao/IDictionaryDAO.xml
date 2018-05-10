@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.IDictionaryDAO">
+    <!--获取当前老师的所有班级-->
+    <select id="getClassAll" resultType="cn.xcq.entity.Dictionary">
+        SELECT * FROM sys_dictionary WHERE dictype='grade' AND dicval IN
+        (
+          SELECT dicval FROM sys_teacher_grade WHERE uid IN
+          (
+            SELECT uid FROM userinfo WHERE uid=#{uid}
+          )
+        )
+    </select>
+
+    <!--获取班级下的所有学生-->
+    <select id="getUserAll" resultType="cn.xcq.entity.UserInfo">
+        SELECT * FROM userinfo WHERE ugradeid IN
+          (
+	        SELECT dicval FROM sys_dictionary WHERE dicval=#{dicval} AND dictype='grade'
+          )
+    </select>
+
+    <!--添加出勤信息-->
+    <insert id="addSign">
+        INSERT INTO sys_student_attendance(id,studentid,gradeid,attendanceid,attendancetime)VALUES(DEFAULT ,#{studentid},#{gradeid},#{attendanceid},#{attendancetime})
+    </insert>
+
+    <!--判断是否已添加-->
+    <select id="ifattendance" resultType="int">
+        SELECT COUNT(1) FROM sys_student_attendance WHERE gradeid=#{0} AND  attendancetime=#{1}
+    </select>
+
+    <!--查询所有班级-->
+    <select id="getDictionary" resultType="cn.xcq.entity.Dictionary">
+        SELECT * FROM sys_dictionary WHERE dictype='grade'
+    </select>
+</mapper>

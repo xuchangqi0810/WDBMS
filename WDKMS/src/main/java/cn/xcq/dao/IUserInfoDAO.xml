@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.IUserInfoDAO">
+    <!--登录-->
+    <select id="isLogin" resultType="cn.xcq.entity.UserInfo">
+        SELECT * from userinfo where unickname=#{unickname} and upwd=#{upwd}
+    </select>
+
+    <!--查询所有用户-->
+    <select id="getAll" resultType="cn.xcq.entity.UserInfo">
+        SELECT * from userinfo
+        <where>
+            <if test="unickname!=null">
+               AND unickname LIKE '%' #{unickname} '%'
+            </if>
+        </where>
+        limit #{1},#{2}
+    </select>
+
+    <!--根据id修改用户-->
+    <update id="UpdateUser" >
+        UPDATE userinfo set uname=#{uname},unickname=#{unickname},uemail=#{uemail},
+        uphone=#{uphone},uidentityid=#{uidentityid},ubirthday=#{ubirthday},ugradeid=#{ugradeid},ugender=#{ugender}
+        where uid=#{uid}
+    </update>
+
+    <!--根据id获取UserInfo对象-->
+    <select id="getUserInfo" resultType="cn.xcq.entity.UserInfo">
+        SELECT * from userinfo where uid=#{uid}
+    </select>
+
+    <!--添加用户-->
+    <insert id="addUser">
+        INSERT INTO userinfo VALUES (DEFAULT ,#{uname},#{unickname},#{upwd},#{uemail},#{uphone},#{uidentityid},#{ubirthday},#{ugradeid},#{ugender},#{lastlogintime},#{lastAddress})
+    </insert>
+
+    <!--根据id删除用户-->
+    <delete id="deleteUser">
+        DELETE FROM userinfo WHERE uid=#{uid}
+    </delete>
+
+    <!--修改上次登录时间和ip-->
+    <update id="updateLastlogintime">
+        UPDATE userinfo SET Lastlogintime=#{0},LastAddress=#{2} WHERE uid=#{1}
+    </update>
+
+    <!--查询所有记录数-->
+    <select id="getCount" resultType="int">
+        SELECT count(1) FROM userinfo
+        <where>
+            <if test="unickname!=null">
+                AND unickname LIKE '%' #{unickname} '%'
+            </if>
+        </where>
+    </select>
+
+    <!--查询所有用户-->
+    <select id="getUserInfoExcel" resultType="cn.xcq.entity.UserInfo">
+        select * from userinfo
+    </select>
+
+
+</mapper>

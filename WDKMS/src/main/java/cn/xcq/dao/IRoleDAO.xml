@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.IRoleDAO">
+    <!--查询所有角色-->
+    <select id="getAllRole" resultType="cn.xcq.entity.Role">
+        SELECT * from sys_role
+    </select>
+
+    <!--获取角色所拥有的权限-->
+    <select id="getRolePrivilege" resultType="cn.xcq.entity.Privilege">
+         SELECT * FROM sys_privilege WHERE id IN
+        (
+          SELECT privilegeId FROM sys_role_privilege WHERE roleid =#{rid}
+        )
+    </select>
+
+    <!--添加角色权限-->
+    <insert id="addRolePrivilege">
+          INSERT INTO sys_role_privilege(roleId,privilegeId) VALUES (#{0},#{1})
+    </insert>
+
+    <!--删除角色权限-->
+    <delete id="DeleteRolePrivilege">
+        DELETE FROM sys_role_privilege WHERE roleid=#{roleId}
+    </delete>
+
+</mapper>

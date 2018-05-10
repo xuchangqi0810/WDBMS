@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.IAttendanceDAO">
+    <!--查询指定学员出勤信息-->
+    <select id="getAttendance" resultMap="AttendUser">
+        SELECT SUM(a.`attendanceid`=1) chuqin,SUM(a.`attendanceid`=2) queqin,SUM(a.`attendanceid`=3) chidao,b.`uname`,a.studentid FROM sys_student_attendance a,userinfo b
+        <where>
+            <if test="selecttype==1">
+                AND  a.`studentid`=b.`uid` AND b.uid=#{uid} AND a.attendancetime=CURRENT_DATE
+            </if>
+            <if test="selecttype==2">
+                AND a.`studentid`=b.`uid` AND b.uid=#{uid} AND a.attendancetime BETWEEN CURRENT_DATE-7 AND CURRENT_DATE
+            </if>
+            <if test="selecttype==3">
+                AND a.`studentid`=b.`uid` AND b.uid=#{uid} AND a.attendancetime BETWEEN CURRENT_DATE-30 AND CURRENT_DATE
+            </if>
+        </where>
+        GROUP BY a.`studentid`
+    </select>
+
+    <resultMap id="AttendUser" type="cn.xcq.entity.Attendance">
+        <association property="studentid" javaType="cn.xcq.entity.UserInfo" select="getUser" column="studentid"></association>
+    </resultMap>
+
+    <select id="getUser" resultType="cn.xcq.entity.UserInfo">
+        SELECT * FROM userinfo WHERE uid=#{studentid}
+    </select>
+
+
+    <!--查询指定班级出勤信息-->
+    <select id="selectClassAttendance" resultMap="classAttendance">
+        SELECT SUM(a.`attendanceid`=1) chuqin,SUM(a.`attendanceid`=2) queqin,SUM(a.`attendanceid`=3) chidao,b.`uname`,a.studentid FROM sys_student_attendance a,userinfo b
+        <where>
+            <if test="selecttype==1">
+                AND a.`gradeid`=#{gradeid} AND  a.`studentid`=b.`uid` AND a.attendancetime=CURRENT_DATE
+            </if>
+            <if test="selecttype==2">
+                AND a.`gradeid`=#{gradeid} AND a.`studentid`=b.`uid` AND a.attendancetime BETWEEN CURRENT_DATE-7 AND CURRENT_DATE
+            </if>
+            <if test="selecttype==3">
+                AND a.`gradeid`=#{gradeid} AND a.`studentid`=b.`uid` AND a.attendancetime BETWEEN CURRENT_DATE-30 AND CURRENT_DATE
+            </if>
+        </where>
+        GROUP BY a.`studentid`
+    </select>
+
+    <resultMap id="classAttendance" type="cn.xcq.entity.Attendance">
+        <association property="studentid" javaType="cn.xcq.entity.UserInfo" select="getselect" column="studentid"></association>
+    </resultMap>
+
+    <select id="getselect" resultType="cn.xcq.entity.UserInfo">
+        SELECT * FROM userinfo WHERE uid=#{studentid}
+    </select>
+
+</mapper>

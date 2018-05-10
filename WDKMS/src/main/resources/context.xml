@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--包扫描器-->
+    <context:component-scan base-package="cn.xcq,cn.front"/>
+
+    <!--注解驱动-->
+    <mvc:annotation-driven/>
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 其他配置 -->
+        <!--过滤器-->
+        <property name = "filters" value = "${jdbc.filters}" />
+        <!-- 最大并发连接数 -->
+        <property name = "maxActive" value = "${jdbc.maxActive}" />
+        <!-- 初始化连接数量 -->
+        <property name = "initialSize" value = "${jdbc.initialSize}" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name = "maxWait" value = "${jdbc.maxWait}" />
+        <!-- 最小空闲连接数 -->
+        <property name = "minIdle" value = "${jdbc.minIdle}" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name = "timeBetweenEvictionRunsMillis" value ="${jdbc.timeBetweenEvictionRunsMillis}" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name = "minEvictableIdleTimeMillis" value ="${jdbc.minEvictableIdleTimeMillis}" />
+        <property name = "validationQuery" value = "${jdbc.validationQuery}" />
+
+        <property name = "testWhileIdle" value = "${jdbc.testWhileIdle}" />
+        <property name = "testOnBorrow" value = "${jdbc.testOnBorrow}" />
+        <property name = "testOnReturn" value = "${jdbc.testOnReturn}" />
+        <property name = "maxOpenPreparedStatements" value ="${jdbc.maxOpenPreparedStatements}" />
+        <!-- 打开 removeAbandoned 功能 -->
+        <property name = "removeAbandoned" value = "${jdbc.removeAbandoned}" />
+        <!-- 1800 秒，也就是 30 分钟 -->
+        <property name = "removeAbandonedTimeout" value ="${jdbc.removeAbandonedTimeout}" />
+        <!-- 关闭 abanded 连接时输出错误日志 -->
+        <property name = "logAbandoned" value = "${jdbc.logAbandoned}" />
+
+    </bean>
+
+    <!--mybatis配置文件-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:Mybatis-config.xml"></property>
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--识别jdbc.properties文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!--把SqlSessionFactory生产权交给spring-->
+   <!-- <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>-->
+
+    <!--DAO-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--设置包路径-->
+        <property name="basePackage" value="cn.xcq.dao,cn.front.dao"/>
+    </bean>
+
+    <!-- 定义文件上传解析器 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设定默认编码 -->
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <!-- 设定文件上传的最大值5MB，5*1024*1024 -->
+        <property name="maxUploadSize" value="5242880"></property>
+    </bean>
+
+    <!--配置验证器-->
+    <bean id="myvalidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+    </bean>
+
+    <!--绑定验证器-->
+    <mvc:annotation-driven validator="myvalidator"/>
+
+    <!--spring监控-->
+    <bean id="druidinterceptor"
+          class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+
+    <bean id="druidpointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+        <property name="patterns">
+            <list>
+                <value>cn.xcq.service.*</value>
+                <value>cn.xcq.dao.*</value>
+            </list>
+        </property>
+    </bean>
+
+    <aop:config>
+        <aop:advisor advice-ref="druidinterceptor"
+                     pointcut-ref="druidpointcut" />
+    </aop:config>
+
+
+    <!--事物-->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager" />
+
+    <!--后置增强-->
+    <bean id="log" class="cn.xcq.aop.LogAfterAdvice"></bean>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="mypoint" expression="execution(* *..controller.*Controller.*(..))"/>
+        <aop:advisor advice-ref="log" pointcut-ref="mypoint"/>
+    </aop:config>
+
+</beans>

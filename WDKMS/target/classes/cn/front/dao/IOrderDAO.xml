@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.front.dao.IOrderDAO">
+
+    <!--添加订单信息-->
+    <insert id="addOrder">
+        INSERT INTO `order`(id,uid,ordernumber,t_vid,price,`type`,ordertime)VALUES(default,#{uid},#{ordernumber},#{t_vid},#{price},0,CURRENT_TIMESTAMP )
+    </insert>
+
+    <!--修改订单信息-->
+    <insert id="updateOrder">
+        UPDATE `order` SET `type`=1 WHERE ordernumber=#{0}
+    </insert>
+</mapper>

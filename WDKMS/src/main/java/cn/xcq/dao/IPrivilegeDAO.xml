@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.xcq.dao.IPrivilegeDAO">
+    <!--查询当前用户权限-->
+    <select id="getAllPrivilege" resultType="cn.xcq.entity.Privilege">
+        SELECT * FROM sys_privilege WHERE id IN
+        (
+          SELECT privilegeId FROM sys_role_privilege WHERE roleid IN
+          (
+            SELECT roleid FROM sys_user_role WHERE userid=#{uid}
+          )
+        )
+    </select>
+
+    <!--查询所有权限-->
+    <select id="getPrivilege" resultType="cn.xcq.entity.Privilege">
+        SELECT * from sys_privilege
+    </select>
+</mapper>

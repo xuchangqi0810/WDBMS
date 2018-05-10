@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.front.dao.IMobileUserDAO">
+
+    <!--分类-->
+    <select id="login" resultType="cn.front.entity.MobileUser">
+        SELECT * FROM mobile_phone_users WHERE username=#{username} and userpwd=#{userpwd}
+    </select>
+
+    <!--注册-->
+    <insert id="register">
+        insert into mobile_phone_users(id,username,userphone,userpwd)VALUES (DEFAULT,#{username},#{userphone},#{userpwd})
+    </insert>
+
+</mapper>

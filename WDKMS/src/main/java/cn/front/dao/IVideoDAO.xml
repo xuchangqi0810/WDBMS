@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.front.dao.IVideoDAO">
+
+    <!--精品视频分类-->
+    <select id="getDetailsVideo" resultType="cn.front.entity.Video">
+        SELECT * FROM t_video WHERE t_vid=#{0}
+    </select>
+
+</mapper>

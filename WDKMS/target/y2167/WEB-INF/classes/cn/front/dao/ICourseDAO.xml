@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace:接口绝对路径-->
+<mapper namespace="cn.front.dao.ICourseDAO">
+
+
+    <resultMap id="VideoResultMap" type="cn.front.entity.Video" >
+        <id column="t_vid" property="t_vid" jdbcType="INTEGER" />
+        <result column="t_vname" property="t_vname" jdbcType="VARCHAR" />
+        <result column="t_vimage" property="t_vimage" jdbcType="VARCHAR" />
+        <result column="t_vvideourl" property="t_vvideourl" jdbcType="VARCHAR" />
+        <result column="t_cid" property="t_cid" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="cn.front.entity.Course" >
+        <id column="t_cid" property="id" jdbcType="INTEGER" />
+        <result column="t_cimage" property="cimage" jdbcType="VARCHAR" />
+        <result column="t_cname" property="cname" jdbcType="VARCHAR" />
+        <result column="t_cparent" property="cparent" jdbcType="INTEGER" />
+        <result column="t_ccomment" property="comment" jdbcType="INTEGER" />
+        <result column="t_type" property="type" jdbcType="INTEGER" />
+        <result column="t_courseintroduction" property="courseintroduction" jdbcType="VARCHAR" />
+        <result column="t_courseTarget" property="courseTarget" jdbcType="VARCHAR" />
+        <result column="t_Compatiblepeople" property="compatiblepeople" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="DOUBLE" />
+
+        <collection property="videoList" ofType="cn.front.entity.Video" column="t_cid" select="getVideoById">
+        </collection>
+    </resultMap>
+
+    <!--精品视频分类-->
+    <select id="getDetailsVideo" resultMap="BaseResultMap">
+        SELECT * FROM t_course WHERE t_cid=#{0}
+    </select>
+
+
+    <select id="getVideoById" resultMap="VideoResultMap">
+        SELECT * FROM t_video WHERE t_cid=#{t_cid}
+    </select>
+
+
+
+    <!--分类-->
+    <select id="getAllCourse" resultMap="BaseResultMap">
+        SELECT * FROM t_course
+    </select>
+
+    <!--精品视频-->
+    <select id="getExcellentVideo" resultMap="BaseResultMap" >
+        SELECT * FROM t_course WHERE t_type=1
+    </select>
+
+
+
+
+
+</mapper>
